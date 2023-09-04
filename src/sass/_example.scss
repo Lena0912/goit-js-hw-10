@@ -26,3 +26,14 @@
   background-size: cover;
   background-position: center;
 }
+.hidden {
+  display: none;
+}
+.show {
+  display: block;
+}
+.error {
+  display: block;
+  color: red;
+  /* Опціонально: колір тексту помилки */
+}
