@@ -1,215 +1,93 @@
 import axios from 'axios';
 axios.defaults.headers.common['x-api-key'] =
-  'live_po7OnoitBJ3FjjKgvIFZpQWsUiyNmCzk8Hx5uHPoMEQ8BZixPjGj0AJ3EZSrTbd5';
-import SlimSelect from 'slim-select';
-import { fetchBreeds, fetchCatByBreed } from './cat-api.js';
-import 'slim-select/dist/slimselect.css';
-import { Notify } from 'notiflix';
-
-const ref = {
-  select: document.querySelector('.breed-select'),
-  loader: document.querySelector('.loader'),
-  error: document.querySelector('.error'),
-  catInfo: document.querySelector('.cat-info'),
-  catPic: document.querySelector('.cat-info-pict'),
-  catDesc: document.querySelector('.cat-info-desc'),
-}
-ref.select.addEventListener('change', onChangeSelect);
-function renderSelect(breeds) {
-  const markup = breeds
-    .map(breed => {
-      return `<option value= '${breed.reference_image_id}'>${breed.name}</option>`;
-    })
-    .join('');
-  ref.select.insertAdjacentHTML('beforeend', markup);
-  new SlimSelect({
-    select: '#single',
-  })
-};
-
-(function fetchBreedsRender() {
-  ref.loader.classList.remove('unvisible')
-  fetchBreeds()
-    .then(breeds => renderSelect(breeds))
-    .catch(error => {
-      console.log(error);
-      Notify.failure(
-        'Oops! Something went wrong! Try reloading the page!'
-      );
-    })
-    .finally(() => {
-      ref.loader.classList.add('unvisible');
-      ref.select.classList.remove('unvisible');
-    });
-})();
-
-function renderDesc(breed) {
-  console.log('breed:', breed);
-
-  if (breed && breed.breeds && breed.breeds.length > 0) {
-    const picture = `<img class="cat-picture" src="${breed.url}" alt="${breed.id}">`;
-    const descript = `<h2 class="cat-info-desc-title">${breed.breeds[0].name}</h2>
-    <p class="cat-info-desc-desc">${breed.breeds[0].description}</p>
-    <p class="cat-info-desc-temp">${breed.breeds[0].temperament}</p>`;
-    ref.catPic.insertAdjacentHTML('beforeend', picture);
-    ref.catDesc.insertAdjacentHTML('beforeend', descript);
-  } else {
-    console.error('Invalid breed object:', breed);
-  }
-}
-// Показати завантажувач
-function showLoader() {
-  ref.loader.classList.remove('hide-loader');
-  ref.loader.classList.add('show-loader');
-}
-
-// Приховати завантажувач
-function hideLoader() {
-  ref.loader.classList.remove('show-loader');
-  ref.loader.classList.add('hide-loader');
-}
-
-function showError() {
-  ref.error.classList.remove('hide-error');
-  ref.error.classList.add('show-error');
-}
-
-function hideError() {
-  ref.error.classList.remove('show-error');
-  ref.error.classList.add('hide-error');
-}
-function fetchBreedsRender() {
-  showLoader(); // Показати завантажувач перед запитом
-  // Приховати select.breed-select та div.cat-info (якщо необхідно)
-  ref.select.classList.add('hide-loader');
-  ref.catInfo.classList.add('hide-loader');
+  'live_v0L9DqdKskGuxYZ5wD2TI8jH2PdtxGXqzFkHgiaJkOxbGJ20bWF6aQ8bBt8QFR2n';
   
-  fetchBreeds()
-    .then(breeds => renderSelect(breeds))
-    .catch(error => {
-      console.log(error);
-      Notify.failure(
-        'Oops! Something went wrong! Try reloading the page!'
-      );
+import { fetchBreeds, fetchCatByBreed } from './cat-api.js';
+import SlimSelect from 'slim-select';
+import 'slim-select/dist/slimselect.css';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+
+const breedSelect = document.querySelector('.breed-select');
+const loader = document.querySelector('.loader');
+const error = document.querySelector('.error');
+const catInfo = document.querySelector('.cat-info');
+ 
+
+catInfo.classList.add('is-hidden');
+breedSelect.addEventListener('change', createMarkup)
+
+function updateSelect(data) {
+  fetchBreeds(data)
+    .then(data => {
+      loader.classList.replace('loader', 'is-hidden');
+
+      let markSelect = data.map(({ name, id }) => {
+        return `<option value= '${id}'>${name}</option>`;
+      });
+    
+      breedSelect.insertAdjacentHTML('beforeend', markSelect);
+      new SlimSelect({
+        select: breedSelect,
+      });
     })
-.finally(() => {
-      hideLoader(); // Приховати завантажувач після завершення запиту
-      // Показати select.breed-select (якщо необхідно)
-      ref.select.classList.remove('hide-loader');
-    });
+    .catch(onError);
 }
+updateSelect();
 
-function onChangeSelect(evt) {
-  showLoader(); // Показати завантажувач перед запитом
-  // Приховати div.cat-info (якщо необхідно)
-  ref.catInfo.classList.add('hide-loader');
-}
+function createMarkup(evt) {
+  loader.classList.replace('is-hidden', 'loader');
+  breedSelect.classList.add('is-hidden');
+  catInfo.classList.add('is-hidden');
 
-
-
-function onChangeSelect(evt) {
-  ref.loader.classList.remove('unvisible');
-  ref.catPic.innerHTML = '';
-  ref.catDesc.innerHTML = '';
-  const breedId = evt.target.value;
-  console.log('breedId: ', breedId);
-  console.log('ref.catPic:', ref.catPic);
-  console.log('ref.catDesc:', ref.catDesc);
+  const breedId = evt.currentTarget.value;
 
   fetchCatByBreed(breedId)
-    .then(breed => renderDesc(breed))
-    .catch(error => {
-      console.log(error);
-      Notify.failure('Oops! Something went wrong! Try reloading the page!');
+    .then(data => {
+      loader.classList.replace('loader', 'is-hidden');
+      breedSelect.classList.remove('is-hidden');
+
+      const { url, breeds } = data[0];
+
+      catInfo.innerHTML = `<img src="${url}" alt="${breeds[0].name}" width="400"/>
+      <div class="box"><h2>${breeds[0].name}</h2>
+      <p>${breeds[0].description}</p>
+      <p><strong>Temperament:</strong> ${breeds[0].temperament}</p></div>`;
+      ref.catInfo.classList.remove('is-hidden');
     })
-    .finally(() => ref.loader.classList.add('unvisible'));
+    .catch(onError);
+}
+
+// Приклад обробки помилок під час HTTP-запиту
+function handleHttpRequest() {
+  const errorElement = document.querySelector('.error');
+  
+  // Успішний запит
+  fetch('your-api-url')
+    .then(response => {
+      if (response.ok) {
+        // Запит успішний, приховуємо помилку
+        errorElement.classList.add('hide-error');
+      } else {
+        // Запит не успішний, можливо, обробити помилку тут
+      }
+    })
+    .catch(error => {
+      // Помилка при запиті (наприклад, втрата мережі)
+      // Відображаємо помилку
+      errorElement.classList.remove('hide-error');
+      errorElement.classList.add('show-error');
+    });
 }
 
 
+// function onError() {
+//   breedSelect.classList.remove('is-hidden');
+//   loader.classList.replace('loader', 'is-hidden');
 
-
-
-
-
-
-
-
-// const url = `https://api.thecatapi.com/v1/images/search?limit=20`;
-// const api_key =
-//   'live_O9lGwjdl8IpSBv1d2UKjTVcgA09lTK5JBJ4EC2yr9pjM9p3ZPwGhnfuNwGgw9JbN';
-
-// const breedSelect = document.getElementById('breed-select');
-
-// // Визначення селекту для порід
-// new SlimSelect({
-//   select: '#selectElement',
-// });
-
-// // Відслідковування події change для селекту
-// breedSelect.addEventListener('change', function () {
-//   const selectedBreedId = breedSelect.value;
-
-//   // Виклик функції для отримання даних про кота та відображення інформації
-//   fetchCatByBreed(selectedBreedId)
-//     .then(catData => {
-//       displayCatInfo(catData);
-//     });
-// });
-
-// const loader = document.querySelector('.loader');
-// const catInfo = document.querySelector('.cat-info');
-
-// // Функція для показу завантажувача та приховування інших елементів
-// function showLoader() {
-//   loader.classList.add('show');
-//   breedSelect.classList.add('hidden');
-//   catInfo.classList.add('hidden');
+//   Notify.failure(
+//     'Oops! Something went wrong! Try reloading the page or select another cat breed!'
+//   );
 // }
-
-// // Функція для приховування завантажувача та показу інших елементів
-// function hideLoader() {
-//   loader.classList.remove('show');
-//   breedSelect.classList.remove('hidden');
-//   catInfo.classList.remove('hidden');
-// }
-
-// // Приклад використання функцій при роботі з запитами
-// showLoader(); // Показати завантажувач перед запитом
-
-// // Після завершення запиту:
-// hideLoader(); // Приховати завантажувач і показати інші елементи
-
-// const error = document.querySelector('.error');
-
-// // Функція для відображення помилки
-// function showError() {
-//   error.classList.add('show');
-// }
-
-// // Функція для приховування помилки
-// function hideError() {
-//   error.classList.remove('show');
-// }
-
-// function displayCatInfo(catData) {
-//   const catInfoDiv = document.querySelector('.cat-info');
-//   const catImage = document.createElement('img');
-//   const catName = document.createElement('h2');
-//   const catDescription = document.createElement('p');
-//   const catTemperament = document.createElement('p');
-
-//   catImage.src = catData[0].url;
-//   catName.textContent = `Name: ${catData[0].breeds[0].name}`;
-//   catDescription.textContent = `Description: ${catData[0].breeds[0].description}`;
-//   catTemperament.textContent = `Temperament: ${catData[0].breeds[0].temperament}`;
-
-//   catInfoDiv.innerHTML = '';
-//   catInfoDiv.appendChild(catImage);
-//   catInfoDiv.appendChild(catName);
-//   catInfoDiv.appendChild(catDescription);
-//   catInfoDiv.appendChild(catTemperament);
-// }
-
 
 
 

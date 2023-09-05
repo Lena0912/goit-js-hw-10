@@ -1,0 +1,19 @@
+.is-hidden {
+    display: none;
+}
+
+.cat-info {
+    display: flex;
+    margin-top: 30px;
+    gap: 20px;
+    
+}
+/* CSS стиль для відображення помилки */
+.show-error {
+    display: block;
+}
+
+/* CSS стиль для приховування помилки */
+.hide-error {
+    display: none;
+}
