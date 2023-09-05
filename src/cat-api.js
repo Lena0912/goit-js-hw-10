@@ -29,13 +29,3 @@ export { fetchBreeds, fetchCatByBreed };
 
 
 
-// export function fetchBreeds() {
-//   const url = 'https://api.thecatapi.com/v1/breeds';
-
-//   return axios.get(url)
-//     .then(response => response.data)
-//     .catch(error => {
-//       console.error('Error fetching cat breeds:', error);
-//       throw error;
-//     });
-// }

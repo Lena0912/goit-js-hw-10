@@ -1,6 +1,6 @@
-// import axios from 'axios';
-// axios.defaults.headers.common['x-api-key'] =
-//   'live_po7OnoitBJ3FjjKgvIFZpQWsUiyNmCzk8Hx5uHPoMEQ8BZixPjGj0AJ3EZSrTbd5';
+import axios from 'axios';
+axios.defaults.headers.common['x-api-key'] =
+  'live_po7OnoitBJ3FjjKgvIFZpQWsUiyNmCzk8Hx5uHPoMEQ8BZixPjGj0AJ3EZSrTbd5';
 import SlimSelect from 'slim-select';
 import { fetchBreeds, fetchCatByBreed } from './cat-api.js';
 import 'slim-select/dist/slimselect.css';
@@ -12,7 +12,7 @@ const ref = {
   error: document.querySelector('.error'),
   catInfo: document.querySelector('.cat-info'),
   catPic: document.querySelector('.cat-info-pict'),
-  catDesc: document.querySelector('.cat-info-desc')
+  catDesc: document.querySelector('.cat-info-desc'),
 }
 ref.select.addEventListener('change', onChangeSelect);
 function renderSelect(breeds) {
@@ -38,18 +38,39 @@ function renderSelect(breeds) {
       );
     })
     .finally(() => {
-      ref.loader.classList.add('unvisible');
+      // ref.loader.classList.add('unvisible');
       ref.select.classList.remove('unvisible');
     });
 })();
+
 function renderDesc(breed) {
-  const picture = `<img class="cat-picture" scr="${breed.url}" alt="${breed.id}"`;
-  const descript = `<h2 class="cat-info-desc-title">${breed.breeds[0].name}</h2>
-  <p class="cat-info-desc-desc">${breed.breed[0].description}</p>
-      <p class="cat-info-desc-temp">${breed.breeds[0].temerament}</p>`;
-  ref.catPic.insertAdjacentHTML('beforeend', picture);
-  ref.catDesc.insertAdjacentHTML('beforeend', descript);
-};
+  console.log('breed:', breed);
+
+  if (breed && breed.breeds && breed.breeds.length > 0) {
+    const picture = `<img class="cat-picture" src="${breed.url}" alt="${breed.id}">`;
+    const descript = `<h2 class="cat-info-desc-title">${breed.breeds[0].name}</h2>
+    <p class="cat-info-desc-desc">${breed.breeds[0].description}</p>
+    <p class="cat-info-desc-temp">${breed.breeds[0].temperament}</p>`;
+    ref.catPic.insertAdjacentHTML('beforeend', picture);
+    ref.catDesc.insertAdjacentHTML('beforeend', descript);
+  } else {
+    console.error('Invalid breed object:', breed);
+  }
+}
+function showError() {
+  ref.error.classList.remove('hide-error');
+  ref.error.classList.add('show-error');
+}
+
+function hideError() {
+  ref.error.classList.remove('show-error');
+  ref.error.classList.add('hide-error');
+}
+
+
+
+
+
 
 function onChangeSelect(evt) {
   ref.loader.classList.remove('unvisible');
