@@ -11,7 +11,7 @@
     color: red;
     /* Опціонально: колір тексту помилки */
 }
-.loader {
+/* .loader {
     transform: rotateZ(45deg);
     perspective: 1000px;
     border-radius: 50%;
@@ -94,11 +94,19 @@
     87% {
         box-shadow: .2em -.2em 0 0 currentcolor;
     }
+} */
+.cat-info {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    font-size: 14px;
+
 }
 .cat-picture {
     width: 200px;
     height: 200px;
 }
+
 .show-loader {
     display: block !important;
 }

@@ -8,7 +8,8 @@ const urlBreeds = 'https://api.thecatapi.com/v1/breeds';
 const urlCat = 'https://api.thecatapi.com/v1/images';
 
 function fetchBreeds() {
-  return fetch(`${urlBreeds}?api_key=${API_KEY}`).then(response => {
+  return fetch(`${urlBreeds}?api_key=${API_KEY}`)
+    .then(response => {
     if (!response.ok) {
       throw new Error(response.status);
     }

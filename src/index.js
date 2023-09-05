@@ -38,7 +38,7 @@ function renderSelect(breeds) {
       );
     })
     .finally(() => {
-      // ref.loader.classList.add('unvisible');
+      ref.loader.classList.add('unvisible');
       ref.select.classList.remove('unvisible');
     });
 })();
@@ -57,6 +57,18 @@ function renderDesc(breed) {
     console.error('Invalid breed object:', breed);
   }
 }
+// Показати завантажувач
+function showLoader() {
+  ref.loader.classList.remove('hide-loader');
+  ref.loader.classList.add('show-loader');
+}
+
+// Приховати завантажувач
+function hideLoader() {
+  ref.loader.classList.remove('show-loader');
+  ref.loader.classList.add('hide-loader');
+}
+
 function showError() {
   ref.error.classList.remove('hide-error');
   ref.error.classList.add('show-error');
@@ -66,9 +78,32 @@ function hideError() {
   ref.error.classList.remove('show-error');
   ref.error.classList.add('hide-error');
 }
+function fetchBreedsRender() {
+  showLoader(); // Показати завантажувач перед запитом
+  // Приховати select.breed-select та div.cat-info (якщо необхідно)
+  ref.select.classList.add('hide-loader');
+  ref.catInfo.classList.add('hide-loader');
+  
+  fetchBreeds()
+    .then(breeds => renderSelect(breeds))
+    .catch(error => {
+      console.log(error);
+      Notify.failure(
+        'Oops! Something went wrong! Try reloading the page!'
+      );
+    })
+.finally(() => {
+      hideLoader(); // Приховати завантажувач після завершення запиту
+      // Показати select.breed-select (якщо необхідно)
+      ref.select.classList.remove('hide-loader');
+    });
+}
 
-
-
+function onChangeSelect(evt) {
+  showLoader(); // Показати завантажувач перед запитом
+  // Приховати div.cat-info (якщо необхідно)
+  ref.catInfo.classList.add('hide-loader');
+}
 
 
 
