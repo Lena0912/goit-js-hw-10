@@ -80,14 +80,14 @@ function handleHttpRequest() {
 }
 
 
-// function onError() {
-//   breedSelect.classList.remove('is-hidden');
-//   loader.classList.replace('loader', 'is-hidden');
+function onError() {
+  breedSelect.classList.remove('hide-error');
+  loader.classList.replace('loader', 'hide-error');
 
-//   Notify.failure(
-//     'Oops! Something went wrong! Try reloading the page or select another cat breed!'
-//   );
-// }
+  Notify.failure(
+    'Oops! Something went wrong! Try reloading the page or select another cat breed!'
+  );
+}
 
 
 
